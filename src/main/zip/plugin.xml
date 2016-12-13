@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<plugin xmlns="http://www.urbancode.com/PluginXMLSchema_v1">
+    <header>
+        <identifier id="com.serena.air.plugin.Ansible" name="Ansible" version="1"/>
+        <description>
+            Provides tasks to interact with Ansible.
+        </description>
+        <tag>Integration/Configuration Management/Ansible</tag>
+    </header>
+
+    <step-type name="Run Ad-Hoc Command">
+        <description>This step runs an ad-hoc Ansible command.</description>
+        <properties>
+            <property name="hostPattern" required="true">
+                <property-ui description="The host pattern to execute the command on." label="Host Pattern"
+                             type="textBox"
+                             default-value="${p:resource.name}"/>
+            </property>
+            <property name="limit" required="false">
+                <property-ui description="Further limit selected hosts to an additional pattern." label="Host Limit"
+                             type="textBox"/>
+            </property>
+            <property name="moduleName" required="false">
+                <property-ui description="The module name to execute, if empty will default to 'command'."
+                             label="Module Name" type="textBox"/>
+            </property>
+            <property name="moduleArgs" required="true">
+                <property-ui description="The arguments for the module." label="Module Args" type="textBox"/>
+            </property>
+            <property name="remoteUser" required="false">
+                <property-ui description="Connect as this user."
+                             label="Remote User" type="textBox"/>
+            </property>
+            <property name="become" required="false">
+                <property-ui description="Run operations with become." label="Become" type="checkBox"/>
+            </property>
+            <property name="becomeUser" required="false">
+                <property-ui description="Run operations with this user, if empty will default to 'root'."
+                             label="Become User" type="textBox"/>
+            </property>
+            <property name="inventoryFile" required="false">
+                <property-ui description="The inventory file to use, if empty defaults to '/etc/ansible/hosts'."
+                             label="Inventory File" type="textBox"/>
+            </property>
+            <property name="privateKeyFile" required="false">
+                <property-ui type="textBox" label="Private Key File"
+                             description="Use this file to authenticate the connection."/>
+            </property>
+            <property name="extraVars" required="false">
+                <property-ui
+                        description="Comma separated list of environment variables to set as extra variable name=value pairs."
+                        label="Extra Variables" type="textBox"/>
+            </property>
+            <property name="path" required="false">
+                <property-ui type="textBox" hidden="true"
+                             label="ansible Path"
+                             description="The name of the ansible command if it is in the system path, or the full path to run the
+                                  ansible command."/>
+            </property>
+            <property name="options" required="false">
+                <property-ui type="textAreaBox" label="Additional Options" hidden="true"
+                             description="A newline-separated list of additional options to pass to the command, e.g. --forks=10"/>
+            </property>
+            <property name="verbose" required="false">
+                <property-ui type="checkBox" label="Verbose Output" hidden="true"
+                             description="Select this option to display verbose output during execution."/>
+            </property>
+        </properties>
+        <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put("Status", "Failure");
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/Ansible.jar"/>
+            <arg value="-Djnp.disableDiscovery=true"/>
+            <arg file="RunCommand.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+    <step-type name="Run Playbook">
+        <description>This step runs an Ansible playbook.</description>
+        <properties>
+            <property name="playbookName" required="false">
+                <property-ui
+                        description="The name of the playbook to execute, if empty will default to 'playbook.yaml'."
+                        label="Playbook Name" type="textBox"/>
+            </property>
+            <property name="limit" required="false">
+                <property-ui description="Limit selected hosts to an additional pattern." label="Host Limit"
+                             type="textBox"/>
+            </property>
+            <property name="tags" required="false">
+                <property-ui description="Only run plays and tasks whose tags match these values." label="Tags"
+                             type="textBox"/>
+            </property>
+            <property name="skipTags" required="false">
+                <property-ui description="Only run plays and tasks whose tags do not match these values."
+                             label="Skip Tags" type="textBox"/>
+            </property>
+            <property name="startAtTask" required="false">
+                <property-ui description="Start the playbook at the task matching this name." label="Start At Task"
+                             type="textBox"/>
+            </property>
+            <property name="remoteUser" required="false">
+                <property-ui description="Connect as this user."
+                             label="Remote User" type="textBox"/>
+            </property>
+            <property name="become" required="false">
+                <property-ui description="Run operations with become." label="Become" type="checkBox"/>
+            </property>
+            <property name="becomeUser" required="false">
+                <property-ui description="Run operations with this user, if empty will default to 'root'."
+                             label="Become User" type="textBox"/>
+            </property>
+            <property name="inventoryFile" required="false">
+                <property-ui description="The inventory file to use, if empty defaults to '/etc/ansible/hosts'."
+                             label="Inventory File" type="textBox"/>
+            </property>
+            <property name="privateKeyFile" required="false">
+                <property-ui type="textBox" label="Private Key File"
+                             description="Use this file to authenticate the connection."/>
+            </property>
+            <property name="extraVars" required="false">
+                <property-ui
+                        description="Comma separated list of environment variables to set as extra variable name=value pairs."
+                        label="Extra Variables" type="textBox"/>
+            </property>
+            <property name="path" required="false">
+                <property-ui type="textBox" hidden="true"
+                             label="ansible Path"
+                             description="The name of the ansible command if it is in the system path, or the full path to run the
+                                  ansible command."/>
+            </property>
+            <property name="options" required="false">
+                <property-ui type="textAreaBox" label="Additional Options" hidden="true"
+                             description="A newline-separated list of additional options to pass to the command, e.g. --forks=10"/>
+            </property>
+            <property name="verbose" required="false">
+                <property-ui type="checkBox" label="Verbose Output" hidden="true"
+                             description="Select this option to display verbose output during execution."/>
+            </property>
+        </properties>
+        <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put("Status", "Failure");
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/Ansible.jar"/>
+            <arg value="-Djnp.disableDiscovery=true"/>
+            <arg file="RunPlaybook.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+
+    <step-type name="Run Playbook (Inline)">
+        <description>This step runs an Ansible playbook using inline script data.</description>
+        <properties>
+            <property name="playbookScript" required="true">
+                <property-ui
+                        description="The inline contents of the playbook to execute, any properties will be automatically expanded before execution."
+                        label="Playbook Contents" type="textAreaBox"/>
+            </property>
+            <property name="limit" required="false">
+                <property-ui description="Limit selected hosts to an additional pattern." label="Host Limit"
+                             type="textBox"/>
+            </property>
+            <property name="tags" required="false">
+                <property-ui description="Only run plays and tasks whose tags match these values." label="Tags"
+                             type="textBox"/>
+            </property>
+            <property name="skipTags" required="false">
+                <property-ui description="Only run plays and tasks whose tags do not match these values."
+                             label="Skip Tags" type="textBox"/>
+            </property>
+            <property name="startAtTask" required="false">
+                <property-ui description="Start the playbook at the task matching this name." label="Start At Task"
+                             type="textBox"/>
+            </property>
+            <property name="remoteUser" required="false">
+                <property-ui description="Connect as this user."
+                             label="Remote User" type="textBox"/>
+            </property>
+            <property name="become" required="false">
+                <property-ui description="Run operations with become." label="Become" type="checkBox"/>
+            </property>
+            <property name="becomeUser" required="false">
+                <property-ui description="Run operations with this user, if empty will default to 'root'."
+                             label="Become User" type="textBox"/>
+            </property>
+            <property name="inventoryFile" required="false">
+                <property-ui description="The inventory file to use, if empty defaults to '/etc/ansible/hosts'."
+                             label="Inventory File" type="textBox"/>
+            </property>
+            <property name="privateKeyFile" required="false">
+                <property-ui type="textBox" label="Private Key File"
+                             description="Use this file to authenticate the connection."/>
+            </property>
+            <property name="extraVars" required="false">
+                <property-ui
+                        description="Comma separated list of environment variables to set as extra variable name=value pairs."
+                        label="Extra Variables" type="textBox"/>
+            </property>
+            <property name="path" required="false">
+                <property-ui type="textBox" hidden="true"
+                             label="ansible Path"
+                             description="The name of the ansible command if it is in the system path, or the full path to run the
+                                  ansible command."/>
+            </property>
+            <property name="options" required="false">
+                <property-ui type="textAreaBox" label="Additional Options" hidden="true"
+                             description="A newline-separated list of additional options to pass to the command, e.g. --forks=10"/>
+            </property>
+            <property name="verbose" required="false">
+                <property-ui type="checkBox" label="Verbose Output" hidden="true"
+                             description="Select this option to display verbose output during execution."/>
+            </property>
+        </properties>
+        <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put("Status", "Failure");
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/Ansible.jar"/>
+            <arg value="-Djnp.disableDiscovery=true"/>
+            <arg file="RunPlaybookInline.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+    <step-type name="Create Resources from Inventory">
+        <description>This step imports an ansible inventory and creates equivalent resources.</description>
+        <properties>
+            <property name="parentResource" required="true">
+                <property-ui
+                        description="The parent resource for the newly created resources, defaults to the resource the process was executed on."
+                        label="Parent Resource"
+                        default-value="${p:resource.name}"
+                        type="textBox"/>
+            </property>
+            <property name="resourceGroup" required="true">
+                <property-ui
+                        description="The path of the Resource Group to add the newly created resource to, e.g. /Production Servers/Linux Web Servers."
+                        label="Resource Group"
+                        type="textBox"/>
+            </property>
+            <property name="hostPattern" required="false">
+                <property-ui description="The host pattern to filter the inventory, defaults to 'all'"
+                             label="Host Pattern"
+                             type="textBox"/>
+            </property>
+            <property name="inventoryFile" required="false">
+                <property-ui description="The inventory file to use, if empty defaults to '/etc/ansible/hosts'."
+                             label="Inventory File" type="textBox"/>
+            </property>
+            <property name="path" required="false">
+                <property-ui type="textBox" hidden="true"
+                             label="ansible Path"
+                             description="The name of the ansible command if it is in the system path, or the full path to run the
+                                  ansible command."/>
+            </property>
+            <property name="verbose" required="false">
+                <property-ui type="checkBox" label="Verbose Output" hidden="true"
+                             description="Select this option to display verbose output during execution."/>
+            </property>
+        </properties>
+        <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put("Status", "Failure");
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/Ansible.jar"/>
+            <arg value="-Djnp.disableDiscovery=true"/>
+            <arg file="CreateResources.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+</plugin>
