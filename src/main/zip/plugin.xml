@@ -8,83 +8,6 @@
         <tag>Integration/Configuration Management/Ansible</tag>
     </header>
 
-    <step-type name="Run Ad-Hoc Command">
-        <description>This step runs an ad-hoc Ansible command.</description>
-        <properties>
-            <property name="hostPattern" required="true">
-                <property-ui description="The host pattern to execute the command on." label="Host Pattern"
-                             type="textBox"
-                             default-value="${p:resource.name}"/>
-            </property>
-            <property name="limit" required="false">
-                <property-ui description="Further limit selected hosts to an additional pattern." label="Host Limit"
-                             type="textBox"/>
-            </property>
-            <property name="moduleName" required="false">
-                <property-ui description="The module name to execute, if empty will default to 'command'."
-                             label="Module Name" type="textBox"/>
-            </property>
-            <property name="moduleArgs" required="true">
-                <property-ui description="The arguments for the module." label="Module Args" type="textBox"/>
-            </property>
-            <property name="remoteUser" required="false">
-                <property-ui description="Connect as this user."
-                             label="Remote User" type="textBox"/>
-            </property>
-            <property name="become" required="false">
-                <property-ui description="Run operations with become." label="Become" type="checkBox"/>
-            </property>
-            <property name="becomeUser" required="false">
-                <property-ui description="Run operations with this user, if empty will default to 'root'."
-                             label="Become User" type="textBox"/>
-            </property>
-            <property name="inventoryFile" required="false">
-                <property-ui description="The inventory file to use, if empty defaults to '/etc/ansible/hosts'."
-                             label="Inventory File" type="textBox"/>
-            </property>
-            <property name="privateKeyFile" required="false">
-                <property-ui type="textBox" label="Private Key File"
-                             description="Use this file to authenticate the connection."/>
-            </property>
-            <property name="extraVars" required="false">
-                <property-ui
-                        description="Comma separated list of environment variables to set as extra variable name=value pairs."
-                        label="Extra Variables" type="textBox"/>
-            </property>
-            <property name="path" required="false">
-                <property-ui type="textBox" hidden="true"
-                             label="ansible Path"
-                             description="The name of the ansible command if it is in the system path, or the full path to run the
-                                  ansible command."/>
-            </property>
-            <property name="options" required="false">
-                <property-ui type="textAreaBox" label="Additional Options" hidden="true"
-                             description="A newline-separated list of additional options to pass to the command, e.g. --forks=10"/>
-            </property>
-            <property name="verbose" required="false">
-                <property-ui type="checkBox" label="Verbose Output" hidden="true"
-                             description="Select this option to display verbose output during execution."/>
-            </property>
-        </properties>
-        <post-processing><![CDATA[
-        if (properties.get("exitCode") != 0) {
-            properties.put("Status", "Failure");
-        }
-        else {
-            properties.put("Status", "Success");
-        }
-     ]]></post-processing>
-
-        <command program="${GROOVY_HOME}/bin/groovy">
-            <arg value="-cp"/>
-            <arg path="classes:lib/Ansible.jar"/>
-            <arg value="-Djnp.disableDiscovery=true"/>
-            <arg file="RunCommand.groovy"/>
-            <arg file="${PLUGIN_INPUT_PROPS}"/>
-            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
-        </command>
-    </step-type>
-
     <step-type name="Run Playbook">
         <description>This step runs an Ansible playbook.</description>
         <properties>
@@ -168,8 +91,8 @@
     </step-type>
 
 
-    <step-type name="Run Playbook (Inline)">
-        <description>This step runs an Ansible playbook using inline script data.</description>
+    <step-type name="Run Ad-hoc Playbook">
+        <description>This step runs an adh-hoc Ansible playbook using inline script data.</description>
         <properties>
             <property name="playbookScript" required="true">
                 <property-ui
@@ -244,7 +167,7 @@
             <arg value="-cp"/>
             <arg path="classes:lib/Ansible.jar"/>
             <arg value="-Djnp.disableDiscovery=true"/>
-            <arg file="RunPlaybookInline.groovy"/>
+            <arg file="RunAdhocPlaybook.groovy"/>
             <arg file="${PLUGIN_INPUT_PROPS}"/>
             <arg file="${PLUGIN_OUTPUT_PROPS}"/>
         </command>
